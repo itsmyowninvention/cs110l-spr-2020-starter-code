@@ -96,40 +96,6 @@
           buildInputs = buildInputs;
           nativeBuildInputs = nativeBuildInputs ++ rustToolchain;
 
-          # Shell 钩子：显示欢迎信息和 Rust 版本
-          shellHook = ''
-            # 加载 .envrc 中的环境变量（如果存在）
-            if [ -f .envrc ]; then
-              eval "$(grep -E '^export ' .envrc | sed 's/^export //')"
-            fi
-
-            echo "====================================="
-            echo "  CS 110L Spring 2020 - Rust 开发环境"
-            echo "====================================="
-            echo ""
-            echo "Rust 版本信息："
-            rustc --version 2>/dev/null || echo "  (未安装)"
-            cargo --version 2>/dev/null || echo "  (未安装)"
-            echo ""
-            echo "可用子项目："
-            echo "  week1/part-1-hello-world"
-            echo "  week1/part-2-warmup"
-            echo "  week1/part-3-hangman"
-            echo "  week2/rdiff"
-            echo "  week2/rwc"
-            echo "  week3/inspect-fds"
-            echo "  week3/linked_list"
-            echo "  week5/farm"
-            echo "  week6/parallel_map"
-            echo "  proj-1/deet"
-            echo "  proj-2/balancebeam"
-            echo ""
-            echo "快速开始："
-            echo "  cd <项目目录> && cargo build"
-            echo "  cd <项目目录> && cargo run"
-            echo ""
-          '';
-
           # 环境变量
           RUST_BACKTRACE = "1";
           CARGO_INCREMENTAL = "1";
