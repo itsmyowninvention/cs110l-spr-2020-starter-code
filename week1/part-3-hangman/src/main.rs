@@ -23,8 +23,25 @@ const WORDS_PATH: &str = "words.txt";
 
 fn pick_a_random_word() -> String {
     let file_string = fs::read_to_string(WORDS_PATH).expect("Unable to read file.");
-    let words: Vec<&str> = file_string.split('\n').collect();
+    let words: Vec<&str> = file_string.split('\n').filter(|w| !w.is_empty()).collect();
     String::from(words[rand::thread_rng().gen_range(0, words.len())].trim())
+}
+
+fn cmp(secret_word: &String, guessed_letters: &String) -> bool {
+    secret_word.chars().all(|c| guessed_letters.contains(c))
+}
+
+fn get_first_char(s: &String) -> Option<char> {
+    s.trim().chars().next()
+}
+
+fn word_so_far(secret_word: &String, guessed_letters: &String) -> String {
+    let guessed_chars: Vec<char> = guessed_letters.chars().collect();
+
+    secret_word
+        .chars()
+        .map(|c| if guessed_chars.contains(&c) { c } else { '-' })
+        .collect()
 }
 
 fn main() {
@@ -32,9 +49,55 @@ fn main() {
     // Note: given what you know about Rust so far, it's easier to pull characters out of a
     // vector than it is to pull them out of a string. You can get the ith character of
     // secret_word by doing secret_word_chars[i].
-    let secret_word_chars: Vec<char> = secret_word.chars().collect();
-    // Uncomment for debugging:
-    // println!("random word: {}", secret_word);
+    println!("Welcome to CS110L Hangman!");
 
-    // Your code here! :)
+    let mut incorrect_count = 0;
+    let mut guessed_letters = String::new();
+
+    while incorrect_count < NUM_INCORRECT_GUESSES && !cmp(&secret_word, &guessed_letters) {
+        println!(
+            "The word so far is {}",
+            word_so_far(&secret_word, &guessed_letters)
+        );
+        println!(
+            "You have guessed the following letters: {}",
+            guessed_letters
+        );
+        println!(
+            "You have {} guesses left",
+            NUM_INCORRECT_GUESSES - incorrect_count
+        );
+        print!("Please guess a letter:");
+        io::stdout().flush().expect("Error flushing stdout.");
+
+        let mut guess = String::new();
+        io::stdin()
+            .read_line(&mut guess)
+            .expect("Error reading line");
+
+        let letter = match get_first_char(&guess) {
+            Some(c) => c,
+            None => {
+                println!("Please enter a valid letter.");
+                continue;
+            }
+        };
+
+        guessed_letters.push(letter);
+
+        // 只有在猜错时才增加计数
+        if !secret_word.contains(letter) {
+            incorrect_count += 1;
+        }
+    }
+
+    // 游戏结果
+    if cmp(&secret_word, &guessed_letters) {
+        println!(
+            "Congratulations you guessed the secret word: {}",
+            secret_word
+        );
+    } else {
+        println!("Sorry, you ran out of guesses!");
+    }
 }
