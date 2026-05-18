@@ -9,6 +9,7 @@ fn main() {
     println!("{}", ref3.to_uppercase());
 }
 ```
+Wrong. There is readonly reference of s, but assign a new value to variable 's' at line 8
 
 
 
@@ -19,7 +20,7 @@ fn drip_drop() -> &String {
     return &s;
 }
 ```
-
+It's wrong. The s will be released but its reference is pass to its parent function
 
 
 Example 3:
@@ -32,3 +33,57 @@ fn main() {
     println!("{}", s2);
 }
 ```
+这段代码编译失败，原因有两个层面：
+
+## 1. 类型不匹配（直接原因）
+
+索引操作 `v[0]` 在 Rust 中**不会移动所有权**，而是返回一个**不可变引用** `&String`。但代码试图将它赋值给 `String` 类型（不是 `&String`），所以编译器报错：类型不匹配。
+
+```rust
+let s2: String = v[0];  // v[0] 的类型是 &String，不是 String
+```
+
+## 2. 无法从 Vec 中"移出"值
+
+即使你改成 `let s2: &String = &v[0];` 勉强让类型对了，编译器还会报另一个错误：**不能通过索引从 Vec 中移出所有权**。因为索引操作的设计就是不消耗原值的——它只是借用。
+
+更根本地说，如果把值移出 `Vec`，`Vec` 的内存布局会被破坏（它还需要管理那块内存来在后续 drop 时释放），所以 Rust 不允许这样做。
+
+## 修复方式
+
+根据你的需求选择：
+
+**方案 A**：使用引用（不需要所有权）
+```rust
+fn main() {
+    let s1 = String::from("hello");
+    let mut v = Vec::new();
+    v.push(s1);
+    let s2: &String = &v[0];  // 借用
+    println!("{}", s2);
+}
+```
+
+**方案 B**：使用 `remove` 真正移出值
+```rust
+fn main() {
+    let s1 = String::from("hello");
+    let mut v = Vec::new();
+    v.push(s1);
+    let s2: String = v.remove(0);  // 移出并删除该元素
+    println!("{}", s2);
+}
+```
+
+**方案 C**：使用 `clone` 复制一份
+```rust
+fn main() {
+    let s1 = String::from("hello");
+    let mut v = Vec::new();
+    v.push(s1);
+    let s2: String = v[0].clone();  // 深拷贝
+    println!("{}", s2);
+}
+```
+
+选择哪种取决于你的实际需求——是需要借用、转移所有权、还是复制一份独立的字符串。
