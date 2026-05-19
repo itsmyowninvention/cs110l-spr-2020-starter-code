@@ -49,11 +49,14 @@ impl Grid {
     /// of bounds, returns Err with an error message.
     pub fn set(&mut self, row: usize, col: usize, val: usize) -> Result<(), &'static str> {
         match self.index(row, col) {
-            Some(idx) => {
-                self.elems[idx] = val;
-                Ok(())
-            }
-            None => Err("out of bounds"),
+            Some(idx) => match self.elems.get_mut(idx) {
+                Some(elem) => {
+                    *elem = val;
+                    Ok(())
+                }
+                None => Err("Out of bounds"),
+            },
+            None => Err("Out of bounds"),
         }
     }
 
