@@ -5,7 +5,6 @@
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-24.11";
     flake-utils.url = "github:numtide/flake-utils";
 
-    # nix-darwin: macOS 系统管理（可选，仅在 macOS 上使用）
     darwin = {
       url = "github:LnL7/nix-darwin/nix-darwin-24.11";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -145,22 +144,6 @@
           RUST_BACKTRACE = "1";
           CARGO_INCREMENTAL = "1";
           RUST_LOG = "info";
-
-          # macOS SDK 相关环境变量（通过 shellHook 注入，确保 clang 能找到 SDK）
-          shellHook =
-            let
-              inherit (pkgs.stdenv) isDarwin;
-            in
-            if isDarwin then
-              ''
-                # 确保 Rust 编译器能找到 macOS SDK
-                export SDKROOT=$(xcrun --sdk macosx --show-sdk-path 2>/dev/null || echo "")
-                echo "🍎 macOS (nix-darwin) 开发环境已就绪"
-              ''
-            else
-              ''
-                echo "🐧 Linux 开发环境已就绪"
-              '';
         };
       }
     )
