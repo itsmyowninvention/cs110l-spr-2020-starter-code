@@ -40,7 +40,8 @@
         # ---- 平台中立的系统依赖 ----
         nativeBuildInputsCommon = with pkgs; [
           # 基础构建工具
-          gcc
+          # 使用 stdenv.cc 而非直接写 gcc：macOS 上自动为 clang，避开 nix gcc 的重复 LC_RPATH bug
+          stdenv.cc
           cmake
           pkg-config
           makeWrapper
