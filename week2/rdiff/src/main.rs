@@ -12,15 +12,25 @@ fn read_file_lines(filename: &str) -> Result<Vec<String>, io::Error> {
     io::BufReader::new(file).lines().collect()
 }
 
-#[allow(unused)] // TODO: delete this line when you implement this function
 fn lcs(seq1: &Vec<String>, seq2: &Vec<String>) -> Grid {
     // Note: Feel free to use unwrap() in this code, as long as you're basically certain it'll
     // never happen. Conceptually, unwrap() is justified here, because there's not really any error
     // condition you're watching out for (i.e. as long as your code is written correctly, nothing
     // external can go wrong that we would want to handle in higher-level functions). The unwrap()
     // calls act like having asserts in C code, i.e. as guards against programming error.
-    unimplemented!();
-    // Be sure to delete the #[allow(unused)] line above
+    let mut grid = Grid::new(seq1.len() + 1, seq2.len() + 1);
+    for i in 1..=seq1.len() {
+        for j in 1..=seq2.len() {
+            if seq1[i - 1] == seq2[j - 1] {
+                grid.set(i, j, grid.get(i - 1, j - 1).unwrap() + 1)
+                    .expect("seq1[i] == seq2[j] branch error");
+            } else {
+                grid.set(i, j, grid.get(i, j - 1).max(grid.get(i - 1, j)).unwrap())
+                    .expect("seq1[i] != seq2[j] branch error");
+            }
+        }
+    }
+    grid
 }
 
 #[allow(unused)] // TODO: delete this line when you implement this function
