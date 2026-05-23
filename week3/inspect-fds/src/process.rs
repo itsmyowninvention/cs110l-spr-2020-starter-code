@@ -1,6 +1,7 @@
 use crate::open_file::OpenFile;
 #[allow(unused)] // TODO: delete this line for Milestone 3
 use std::fs;
+use std::fmt;
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct Process {
@@ -36,6 +37,12 @@ impl Process {
             open_files.push((fd, OpenFile::from_fd(self.pid, fd)?));
         }
         Some(open_files)
+    }
+}
+
+impl fmt::Display for Process {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "{} (pid {}, ppid {})", self.command,self.pid, self.ppid)
     }
 }
 

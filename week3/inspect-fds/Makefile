@@ -1,5 +1,6 @@
-SRCS = $(wildcard *.c)
-PROGS = $(patsubst %.c,%,$(SRCS))
+SRCS := $(wildcard *.c)
+INSPECT_FDS := target/debug/insepct-fds
+PROGS := $(patsubst %.c,%,$(SRCS)) $(INSPECT_FDS)
 
 UNAME_S := $(shell uname -s)
 
@@ -24,6 +25,9 @@ NIX_DEVELOP = docker run $(DOCKER_FLAGS) nixos/nix \
 %: %.c
 	$(NIX_DEVELOP) --command sh -c '$$CC $$CFLAGS -o $@ $<'
 
+$(INSPECT_FDS):
+	$(NIX_DEVELOP) --command sh -c 'cargo build'
+
 shell:
 	@docker run -it $(DOCKER_FLAGS) nixos/nix \
 	nix develop /cs110l-spr-2020-starter-code $(NIX_FLAGS)
@@ -36,9 +40,14 @@ else
 %: %.c
 	$(CC) $(CFLAGS) -o $@ $<
 
+$(INSPECT_FDS):
+	cargo build
+	cp target/debug/inspect-fds ./inspect-fds
+
 endif
 
 clean:
-	rm -f $(PROGS)
+	rm -f $(PROGS) inspect-fds
+	cargo clean
 
 .PHONY: all clean shell
