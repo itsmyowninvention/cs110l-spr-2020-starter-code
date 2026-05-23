@@ -1,5 +1,5 @@
 SRCS := $(wildcard *.c)
-INSPECT_FDS := target/debug/insepct-fds
+INSPECT_FDS := target/debug/inspect-fds
 PROGS := $(patsubst %.c,%,$(SRCS)) $(INSPECT_FDS)
 
 UNAME_S := $(shell uname -s)
@@ -42,7 +42,6 @@ else
 
 $(INSPECT_FDS):
 	cargo build
-	cp target/debug/inspect-fds ./inspect-fds
 
 endif
 
