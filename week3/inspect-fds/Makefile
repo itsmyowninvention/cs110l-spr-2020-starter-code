@@ -10,12 +10,12 @@ clean:
 	rm -f $(PROGS)
 
 shell:
-	docker run \
+	@docker run \
 	-it \
 	--rm \
 	-v nix_store_volume:/nix \
-	-v $(shell pwd):/inspect-fds \
-	-w /inspect-fds \
+	-v $(shell pwd)/../..:/cs110l-spr-2020-starter-code \
+	-w /cs110l-spr-2020-starter-code \
 	nixos/nix \
 	nix develop \
 	--extra-experimental-features nix-command \
