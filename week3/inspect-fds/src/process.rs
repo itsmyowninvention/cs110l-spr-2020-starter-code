@@ -48,6 +48,7 @@ impl fmt::Display for Process {
 
 #[cfg(test)]
 mod test {
+    use super::Process;
     use crate::ps_utils;
     use std::process::{Child, Command};
 
@@ -79,5 +80,12 @@ mod test {
             "Expected list_fds to return None for a zombie process"
         );
         let _ = test_subprocess.kill();
+    }
+
+    #[test]
+    fn test_display() {
+        let process = Process::new(0, 0, "bash".to_string());
+        let display_str = format!("{}", process);
+        assert_eq!(display_str, "bash (pid 0, ppid 0)");
     }
 }
