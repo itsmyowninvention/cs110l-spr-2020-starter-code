@@ -3,6 +3,8 @@ PROGS = $(patsubst %.c,%,$(SRCS))
 
 UNAME_S := $(shell uname -s)
 
+all: $(PROGS)
+
 # ---------------------------------------------------------------------------
 # macOS: 通过 Docker 进入 NixOS 环境进行构建
 # ---------------------------------------------------------------------------
@@ -20,14 +22,9 @@ NIX_DEVELOP = $(DOCKER_RUN) \
 	--extra-experimental-features nix-command \
 	--extra-experimental-features flakes
 
-all: $(PROGS)
-
 # $$CC / $$CFLAGS 由 Nix 环境展开，$@ / $< 由 Make 展开
 %: %.c
 	$(NIX_DEVELOP) --command sh -c 'cd week3/inspect-fds && $$CC $$CFLAGS -o $@ $<'
-
-clean:
-	$(NIX_DEVELOP) --command sh -c 'cd week3/inspect-fds && rm -f $(PROGS)'
 
 shell:
 	@docker run \
@@ -46,14 +43,12 @@ shell:
 # ---------------------------------------------------------------------------
 else
 
-all: $(PROGS)
-
 %: %.c
 	$(CC) $(CFLAGS) -o $@ $<
 
+endif
+
 clean:
 	rm -f $(PROGS)
-
-endif
 
 .PHONY: all clean shell
