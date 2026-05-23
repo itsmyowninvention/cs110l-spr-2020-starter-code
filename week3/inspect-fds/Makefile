@@ -28,6 +28,9 @@ NIX_DEVELOP = docker run $(DOCKER_FLAGS) nixos/nix \
 $(INSPECT_FDS):
 	$(NIX_DEVELOP) --command sh -c 'cargo build'
 
+test:
+	$(NIX_DEVELOP) --command sh -c 'cargo test'
+
 shell:
 	@docker run -it $(DOCKER_FLAGS) nixos/nix \
 	nix develop /cs110l-spr-2020-starter-code $(NIX_FLAGS)
@@ -43,10 +46,13 @@ else
 $(INSPECT_FDS):
 	cargo build
 
+test:
+	cargo test
+
 endif
 
 clean:
 	rm -f $(PROGS) inspect-fds
 	cargo clean
 
-.PHONY: all clean shell
+.PHONY: all clean shell test
